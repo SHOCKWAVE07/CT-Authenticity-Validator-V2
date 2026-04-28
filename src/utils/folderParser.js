@@ -94,19 +94,17 @@ export async function parseFolder(zipFile) {
         }
         // Test: Needs Input + Target
         else if (phase === 'test') {
-            // Supports Blinded (input + target) OR Unblinded Triplets (fallback/dev mode)
-            if (input && target) {
+            const actualTarget = target || acquired || synth;
+            if (input && actualTarget) {
                 manifest.test.push({
                     id,
                     input: getUrl(input.blob),
-                    target: getUrl(target.blob),
+                    target: getUrl(actualTarget.blob),
                     inputModality: input.modality,
-                    targetModality: target.modality
+                    targetModality: actualTarget.modality
                     // No acquired/synth here, blind!
                 });
             }
-            // Fallback for dev: if we have acquired/synth but no target, maybe we want to use them? 
-            // But strictly speaking, the expert package has target.
         }
     });
 

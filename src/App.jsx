@@ -101,6 +101,9 @@ function App() {
                 }}
               />
             </div>
+            <button className="btn" onClick={startDemo}>
+              Run Demo
+            </button>
           </div>
 
           <div style={{ marginTop: '3rem', borderTop: '1px solid var(--border-color)', paddingTop: '1rem', width: '100%' }}>

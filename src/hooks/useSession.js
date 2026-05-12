@@ -121,9 +121,9 @@ export function useSession() {
         let isCorrect = null;
         if (currentPair.targetType !== 'BLINDED') {
             if (currentPair.targetType === 'Acquired') {
-                isCorrect = rating >= 4 ? true : (rating <= 2 ? false : null);
+                isCorrect = rating >= 3;
             } else if (currentPair.targetType === 'Synthetic') {
-                isCorrect = rating <= 2 ? true : (rating >= 4 ? false : null);
+                isCorrect = rating <= 2;
             }
         }
 

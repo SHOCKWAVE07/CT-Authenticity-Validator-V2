@@ -113,7 +113,7 @@ export const AdminPortal = ({ onExit }) => {
         const test = shuffled.slice(config.warmup, config.warmup + config.test);
 
         const zip = new JSZip();
-        const masterKey = [['Case_ID', 'Chosen_Target_Origin']]; // Header
+        const masterKey = [['Case_ID', 'Phase', 'Chosen_Target_Origin']]; // Header
 
         let processedCount = 0;
         const totalToProcess = warmup.length + test.length;
@@ -148,7 +148,7 @@ export const AdminPortal = ({ onExit }) => {
             const targetName = `target_${targetType.toLowerCase()}.png`;
             folder.file(targetName, targetBlob);
 
-            masterKey.push([c.id, targetType]);
+            masterKey.push([c.id, 'WARMUP', targetType]);
         }
 
         // Process Test (Blind)
@@ -158,7 +158,7 @@ export const AdminPortal = ({ onExit }) => {
             setStatusMsg(`Blinding Test Case: ${c.id}...`);
 
             const isAcquired = Math.random() < 0.5;
-            masterKey.push([c.id, isAcquired ? 'Acquired' : 'Synthetic']);
+            masterKey.push([c.id, 'TEST', isAcquired ? 'Acquired' : 'Synthetic']);
 
             const folder = zip.folder(`test/${c.id}`);
 

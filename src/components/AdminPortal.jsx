@@ -118,8 +118,21 @@ export const AdminPortal = ({ onExit }) => {
         let processedCount = 0;
         const totalToProcess = warmup.length + test.length;
 
-        // Process Warmup
-        for (const c of warmup) {
+        // --- Warmup Distribution Logic ---
+        const warmupTargets = [];
+        const numAcquiredWarmup = Math.ceil(warmup.length / 2);
+        for (let i = 0; i < warmup.length; i++) {
+            warmupTargets.push(i < numAcquiredWarmup ? 'Acquired' : 'Synthetic');
+        }
+        // Shuffle the targets
+        warmupTargets.sort(() => 0.5 - Math.random());
+        // ----------------------------------
+
+        // Process Warmup (Now Blinded in Package)
+        for (let i = 0; i < warmup.length; i++) {
+            const c = warmup[i];
+            const targetType = warmupTargets[i];
+            
             processedCount++;
             setProgress(Math.round((processedCount / totalToProcess) * 100));
             setStatusMsg(`Processing Warmup Case: ${c.id}...`);
@@ -127,14 +140,15 @@ export const AdminPortal = ({ onExit }) => {
             const folder = zip.folder(`warmup/${c.id}`);
 
             const inputBlob = await stripMetadata(c.imgs.input);
-            const acquiredBlob = await stripMetadata(c.imgs.acquired);
-            const synthBlob = await stripMetadata(c.imgs.synthetic);
+            const targetFile = targetType === 'Acquired' ? c.imgs.acquired : c.imgs.synthetic;
+            const targetBlob = await stripMetadata(targetFile);
 
             folder.file(c.imgs.input.name.replace(/\.[^/.]+$/, "") + ".png", inputBlob);
-            folder.file(c.imgs.acquired.name.replace(/\.[^/.]+$/, "") + ".png", acquiredBlob);
-            folder.file(c.imgs.synthetic.name.replace(/\.[^/.]+$/, "") + ".png", synthBlob);
+            // Include target type in filename for app feedback, but user sees just "target"
+            const targetName = `target_${targetType.toLowerCase()}.png`;
+            folder.file(targetName, targetBlob);
 
-            masterKey.push([c.id, 'WARMUP']);
+            masterKey.push([c.id, targetType]);
         }
 
         // Process Test (Blind)
